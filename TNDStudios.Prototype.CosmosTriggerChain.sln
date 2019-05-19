@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TNDStudios.Prototype.CosmosTriggerChain", "TNDStudios.Prototype.CosmosTriggerChain\TNDStudios.Prototype.CosmosTriggerChain.csproj", "{06887D93-EFD9-42E2-B8D2-8684D75E67D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{06887D93-EFD9-42E2-B8D2-8684D75E67D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06887D93-EFD9-42E2-B8D2-8684D75E67D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06887D93-EFD9-42E2-B8D2-8684D75E67D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06887D93-EFD9-42E2-B8D2-8684D75E67D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14A0AA1A-8029-40C2-95C8-0DE8911A3F8B}
+	EndGlobalSection
+EndGlobal
