@@ -23,7 +23,7 @@ namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
                 ConnectionStringSetting = "CosmosDBConnection",
                 LeaseCollectionName = "leases",
                 CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-            Binder binder, // Manual binding so X blobs etc. can be bound when the binding outcome is not known
+            Binder binder, // https://github.com/Azure/Azure-Functions/issues/162 : Even though docs sometimes say you can use an IAsyncCollector you can't with CloudBlobs
             [ServiceBus(
                 queueOrTopicName: "timesheets", 
                 Connection = "ServiceBusConnection")]IAsyncCollector<Message> serviceBus,
