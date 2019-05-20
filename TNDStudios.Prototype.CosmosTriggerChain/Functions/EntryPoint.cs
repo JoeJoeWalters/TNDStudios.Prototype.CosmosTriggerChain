@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TNDStudios.Prototype.CosmosTriggerChain
@@ -20,6 +22,11 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                 collectionName: "RawLines",
                 ConnectionStringSetting = "CosmosDBConnection")]
                 IAsyncCollector<RawLine> documentOutput,
+            [CosmosDB(
+                databaseName: "TimeStreamProcessing",
+                collectionName: "RawLines",
+                ConnectionStringSetting = "CosmosDBConnection")]
+                DocumentClient client,
             ILogger log)
         {
             RawLine data = null;
@@ -42,8 +49,19 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                 if ((data.Id ?? String.Empty) != String.Empty &&
                     (data.TimesheetId ?? String.Empty) != String.Empty)
                 {
-                    await documentOutput.AddAsync(data);
-                    return new OkResult();
+                    IQueryable<RawLine> queryDocuments = client
+                                    .CreateDocumentQuery<RawLine>(
+                                        UriFactory.CreateDocumentCollectionUri("TimeStreamProcessing", "RawLines"), 
+                                        new FeedOptions() { EnableCrossPartitionQuery = true })
+                                    .Where(so => (so.Id == data.Id) || (so.TimesheetId == data.TimesheetId && so.SequenceNumber == data.SequenceNumber));
+
+                    if (queryDocuments.ToList().Count == 0)
+                    {
+                        await documentOutput.AddAsync(data);
+                        return new OkResult();
+                    }
+                    else
+                        return new UnprocessableEntityObjectResult("Item has already been recieved.");
                 }
                 else
                     return new BadRequestObjectResult("No Id provided to identify the line uniquely.");

@@ -1,5 +1,6 @@
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,9 +15,6 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
 {
     public static class Merge
     {
-        public static DocumentClient documentClient;
-        public static Uri collectionLink;
-
         [FunctionName("Merge")]
         public static async Task Run(
             [CosmosDBTrigger(
@@ -31,39 +29,24 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                 ConnectionStringSetting = "CosmosDBConnection",
                 CreateIfNotExists = true)]
                 IAsyncCollector<ProcessedObject> documentOutput,
+            [CosmosDB(databaseName: "TimeStreamProcessing",
+                collectionName: "Processed",
+                ConnectionStringSetting = "CosmosDBConnection")]
+                DocumentClient client,
             ILogger log,
             ExecutionContext context)
         {
             if (input != null && input.Count > 0)
             {
                 log.LogInformation("Documents modified " + input.Count);
-
-                if (documentClient == null)
-                {
-                    var config = new ConfigurationBuilder()
-                     .SetBasePath(context.FunctionAppDirectory)
-                     .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                     .AddEnvironmentVariables()
-                     .Build();
-
-                    String authKey = String.Empty;
-                    Uri serviceEndPoint = null;
-
-                    DbConnectionStringBuilder builder = new DbConnectionStringBuilder { ConnectionString = config.GetConnectionString("CosmosDBConnection") ?? String.Empty };
-                    if (builder.TryGetValue("AccountKey", out object key)) { authKey = key.ToString(); }
-                    if (builder.TryGetValue("AccountEndpoint", out object uri)) { serviceEndPoint = new Uri(uri.ToString()); }
-                    if (authKey != String.Empty && serviceEndPoint != null) { documentClient = new DocumentClient(serviceEndPoint, authKey); }
-
-                    collectionLink = UriFactory.CreateDocumentCollectionUri("TimeStreamProcessing", "RawLines");
-                }
-
+                
                 foreach (Document doc in input)
                 {
                     RawLine rawLine = JsonConvert.DeserializeObject<RawLine>(doc.ToString());
                     if (rawLine != null)
                     {
-                        IQueryable<RawLine> queryDocuments = documentClient
-                                    .CreateDocumentQuery<RawLine>(collectionLink)
+                        IQueryable<RawLine> queryDocuments = client
+                                    .CreateDocumentQuery<RawLine>(UriFactory.CreateDocumentCollectionUri("TimeStreamProcessing", "RawLines"))
                                     .Where(so => so.TimesheetId == rawLine.TimesheetId);
 
                         List<RawLine> foundLines = queryDocuments.ToList<RawLine>();
@@ -77,7 +60,6 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                             };
 
                             await documentOutput.AddAsync(processedObject);
-
                         }
                     }
                 }
