@@ -17,7 +17,7 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                 databaseName: "TimeStreamProcessing",
                 collectionName: "RawLines",
                 ConnectionStringSetting = "CosmosDBConnection",
-                LeaseCollectionName = "leases",
+                LeaseCollectionName = "RawLines_Merge_Leases",
                 CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
             [CosmosDB(
                 databaseName: "TimeStreamProcessing",
@@ -32,31 +32,28 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
             ILogger log)/*,
             ExecutionContext context)*/
         {
-            if (input != null && input.Count > 0)
+            log.LogInformation("Documents modified " + input.Count);
+
+            foreach (Document doc in input ?? new List<Document>())
             {
-                log.LogInformation("Documents modified " + input.Count);
-                
-                foreach (Document doc in input)
+                RawLine rawLine = JsonConvert.DeserializeObject<RawLine>(doc.ToString());
+                if (rawLine != null)
                 {
-                    RawLine rawLine = JsonConvert.DeserializeObject<RawLine>(doc.ToString());
-                    if (rawLine != null)
+                    IQueryable<RawLine> queryDocuments = client
+                                .CreateDocumentQuery<RawLine>(UriFactory.CreateDocumentCollectionUri("TimeStreamProcessing", "RawLines"))
+                                .Where(so => so.TimesheetId == rawLine.TimesheetId);
+
+                    List<RawLine> foundLines = queryDocuments.ToList<RawLine>();
+                    if (foundLines.Count > 0 && foundLines.Count == foundLines[0].TotalItems)
                     {
-                        IQueryable<RawLine> queryDocuments = client
-                                    .CreateDocumentQuery<RawLine>(UriFactory.CreateDocumentCollectionUri("TimeStreamProcessing", "RawLines"))
-                                    .Where(so => so.TimesheetId == rawLine.TimesheetId);
-
-                        List<RawLine> foundLines = queryDocuments.ToList<RawLine>();
-                        if (foundLines.Count > 0 && foundLines.Count == foundLines[0].TotalItems)
+                        ProcessedObject processedObject = new ProcessedObject()
                         {
-                            ProcessedObject processedObject = new ProcessedObject()
-                            {
-                                Id = foundLines[0].TimesheetId,
-                                User = foundLines[0].User,
-                                Lines = foundLines.Select(line => new ProcessedObjectLine() { Day = line.Day, RateCode = line.RateCode, Units = line.Units }).ToList()
-                            };
+                            Id = foundLines[0].TimesheetId,
+                            User = foundLines[0].User,
+                            Lines = foundLines.Select(line => new ProcessedObjectLine() { Day = line.Day, RateCode = line.RateCode, Units = line.Units }).ToList()
+                        };
 
-                            await documentOutput.AddAsync(processedObject);
-                        }
+                        await documentOutput.AddAsync(processedObject);
                     }
                 }
             }

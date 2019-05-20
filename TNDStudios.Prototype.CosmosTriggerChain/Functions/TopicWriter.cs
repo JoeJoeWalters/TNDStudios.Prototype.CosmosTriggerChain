@@ -11,17 +11,19 @@ using System.Threading.Tasks;
 
 namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
 {
-    public static class BlobWriter
+    public static class TopicWriter
     {
-        [FunctionName("BlobWriter")]
+        [FunctionName("TopicWriter")]
         public static async Task Run(
             [CosmosDBTrigger(
                 databaseName: "TimeStreamProcessing",
                 collectionName: "Processed",
                 ConnectionStringSetting = "CosmosDBConnection",
-                LeaseCollectionName = "Processed_BlobWriter_Leases",
+                LeaseCollectionName = "Processed_TopicWriter_Leases",
                 CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-            Binder binder, // https://github.com/Azure/Azure-Functions/issues/162 : Even though docs sometimes say you can use an IAsyncCollector you can't with CloudBlobs
+            [ServiceBus(
+                queueOrTopicName: "timesheets",
+                Connection = "ServiceBusConnection")]IAsyncCollector<Message> serviceBus,
             ILogger log)
         {
             foreach (Document doc in input ?? new List<Document>())
@@ -29,22 +31,14 @@ namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
                 ProcessedObject processedObject = JsonConvert.DeserializeObject<ProcessedObject>(doc.ToString());
                 if (processedObject != null)
                 {
-                    // Copy blob
-                    string path = $"timesheets/{processedObject.Id}.txt";
+                    Message message = new Message(
+                        Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(processedObject, Formatting.Indented))
+                        );
+                    message.UserProperties["CustomProperty"] = "example property";
 
-                    var attributes = new Attribute[]
-                    {
-                        new BlobAttribute(path),
-                        new StorageAccountAttribute("StorageConnection")
-                    };
-
-                    using (var writer = await binder.BindAsync<TextWriter>(attributes))
-                    {
-                        writer.Write(JsonConvert.SerializeObject(processedObject, Formatting.Indented));
-                    }
+                    await serviceBus.AddAsync(message);
                 }
             }
-
         }
     }
 }
