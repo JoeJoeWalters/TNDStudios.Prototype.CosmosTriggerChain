@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
@@ -22,6 +24,9 @@ namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
                 LeaseCollectionName = "leases",
                 CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
             Binder binder, // Manual binding so X blobs etc. can be bound when the binding outcome is not known
+            [ServiceBus(
+                queueOrTopicName: "timesheets", 
+                Connection = "ServiceBusConnection")]IAsyncCollector<Message> serviceBus,
             ILogger log)
         {
             if (input != null && input.Count > 0)
@@ -44,6 +49,13 @@ namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
                         {
                             writer.Write(JsonConvert.SerializeObject(processedObject, Formatting.Indented));
                         }
+
+                        Message message = new Message(
+                            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(processedObject, Formatting.Indented))
+                            );
+                        message.UserProperties["CustomProperty"] = "example property";
+
+                        await serviceBus.AddAsync(message);
                     }
                 }
 
