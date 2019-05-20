@@ -21,12 +21,12 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                 databaseName: "TimeStreamProcessing",
                 collectionName: "RawLines",
                 ConnectionStringSetting = "CosmosDBConnection")]
-                IAsyncCollector<RawLine> documentOutput,
+                IAsyncCollector<RawLine> documentOutput, // Document writer binding for writing only
             [CosmosDB(
                 databaseName: "TimeStreamProcessing",
                 collectionName: "RawLines",
                 ConnectionStringSetting = "CosmosDBConnection")]
-                DocumentClient client,
+                DocumentClient client, // Document client binding for all document tasks
             ILogger log)
         {
             RawLine data = null;

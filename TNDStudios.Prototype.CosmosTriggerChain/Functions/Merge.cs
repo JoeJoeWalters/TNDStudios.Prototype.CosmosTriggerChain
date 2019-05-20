@@ -28,13 +28,13 @@ namespace TNDStudios.Prototype.CosmosTriggerChain
                 collectionName: "Processed",
                 ConnectionStringSetting = "CosmosDBConnection",
                 CreateIfNotExists = true)]
-                IAsyncCollector<ProcessedObject> documentOutput,
+                IAsyncCollector<ProcessedObject> documentOutput, // Document writer binding for writing only
             [CosmosDB(databaseName: "TimeStreamProcessing",
                 collectionName: "Processed",
                 ConnectionStringSetting = "CosmosDBConnection")]
-                DocumentClient client,
-            ILogger log,
-            ExecutionContext context)
+                DocumentClient client, // Document client binding for all document tasks
+            ILogger log)/*,
+            ExecutionContext context)*/
         {
             if (input != null && input.Count > 0)
             {

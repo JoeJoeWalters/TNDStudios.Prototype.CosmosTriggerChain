@@ -21,7 +21,7 @@ namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
                 ConnectionStringSetting = "CosmosDBConnection",
                 LeaseCollectionName = "leases",
                 CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-            Binder binder,
+            Binder binder, // Manual binding so X blobs etc. can be bound when the binding outcome is not known
             ILogger log)
         {
             if (input != null && input.Count > 0)
