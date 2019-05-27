@@ -1,12 +1,10 @@
 using Microsoft.Azure.Documents;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
@@ -32,7 +30,7 @@ namespace TNDStudios.Prototype.CosmosTriggerChain.Functions
                     // Copy blob
                     string path = $"timesheets/{processedObject.Id}.txt";
 
-                    var attributes = new Attribute[]
+                    Attribute[] attributes = new Attribute[]
                     {
                         new BlobAttribute(path),
                         new StorageAccountAttribute("StorageConnection")
