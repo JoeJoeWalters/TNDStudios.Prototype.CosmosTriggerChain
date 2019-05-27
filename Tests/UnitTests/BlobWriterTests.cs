@@ -20,17 +20,17 @@ namespace Tests
 
         [Theory(DisplayName = "Full Integration Test")]
         [InlineData(null)]
-        public void integration_test(List<RawLine> payloads = null)
+        public void integration_test(List<ProcessedObject> payloads = null)
         {
             // Arrange (if no theory data was supplied
             // so it acts as if it was a test not a theory)
             if (payloads == null || payloads.Count == 0)
             {
                 Int32 docId = 0;
-                payloads = new List<RawLine>();
+                payloads = new List<ProcessedObject>();
                 while (docId < integration_test_payloads_to_send_count)
                 {
-                    payloads.Add(new RawLine()
+                    payloads.Add(new ProcessedObject()
                     {
                         User = $"Joe {docId.ToString()}",
                         Id = Guid.NewGuid().ToString()
@@ -52,12 +52,12 @@ namespace Tests
         /// </summary>
         /// <param name="payloads">The payloads to process</param>
         /// <returns>A mocked writer (for the blobs) to test</returns>
-        public MockWriter Execute(List<RawLine> payloads)
+        public MockWriter Execute(List<ProcessedObject> payloads)
         {
             // Loop the test payloads to create a set of incoming 
             // Cosmos documents for the function
             List<Document> documents = new List<Document>();
-            foreach (RawLine payload in payloads)
+            foreach (ProcessedObject payload in payloads)
             {
                 Document document = new Document(); // New Empty document
                 String json = JsonConvert.SerializeObject(payload, Formatting.Indented); // Cast the payload to a string to load

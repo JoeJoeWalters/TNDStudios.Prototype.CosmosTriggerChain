@@ -9,12 +9,37 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
     <PackageReference Include="NSubstitute" Version="4.2.0" />
+    <PackageReference Include="SpecFlow" Version="3.0.213" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.213" />
+    <PackageReference Include="SpecFlow.xUnit" Version="3.0.213" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Functions\Functions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Specflow\BlobWriter\BlobWriterSpecs.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BlobWriterSpecs.feature</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Specflow\BlobWriterSpecs.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>BlobWriterSpecs.feature.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Specflow\BlobWriter\BlobWriterSpecs.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>BlobWriterSpecs.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>
