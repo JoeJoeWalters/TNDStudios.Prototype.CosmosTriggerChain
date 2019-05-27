@@ -19,31 +19,44 @@ namespace Tests
         private const Int32 integration_test_payloads_to_send_count = 300;
 
         [Theory(DisplayName = "Full Integration Test")]
-        [InlineData(null)]
-        public void integration_test(List<ProcessedObject> payloads = null)
+        [InlineData(null, integration_test_payloads_to_send_count)]
+        public void integration_test(
+            List<ProcessedObject> payloads = null, 
+            Int32 payloadCount = integration_test_payloads_to_send_count)
         {
             // Arrange (if no theory data was supplied
             // so it acts as if it was a test not a theory)
             if (payloads == null || payloads.Count == 0)
-            {
-                Int32 docId = 0;
-                payloads = new List<ProcessedObject>();
-                while (docId < integration_test_payloads_to_send_count)
-                {
-                    payloads.Add(new ProcessedObject()
-                    {
-                        User = $"Joe {docId.ToString()}",
-                        Id = Guid.NewGuid().ToString()
-                    }); // Create a new payload object
-                    docId++; // Next!
-                }
-            }
+                payloads = GeneratePayloads(payloadCount);
 
             // Act
             MockWriter writer = Execute(payloads);
 
             // Assert
             Assert.Equal(writer.WrittenItems.Count, payloads.Count);
+        }
+
+        /// <summary>
+        /// Generate a set of test data
+        /// </summary>
+        /// <param name="payloadCount">How much test data</param>
+        /// <returns>A list of test data</returns>
+        public List<ProcessedObject> GeneratePayloads(Int32 payloadCount)
+        {
+            List<ProcessedObject> result = new List<ProcessedObject>();
+
+            Int32 docId = 0;
+            while (docId < payloadCount)
+            {
+                result.Add(new ProcessedObject()
+                {
+                    User = $"Joe {docId.ToString()}",
+                    Id = Guid.NewGuid().ToString()
+                }); // Create a new payload object
+                docId++; // Next!
+            }
+
+            return result;
         }
 
         /// <summary>

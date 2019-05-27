@@ -77,14 +77,14 @@ namespace Tests.Specflow.BlobWriter
             this.ScenarioTearDown();
         }
         
-        [Xunit.FactAttribute(DisplayName="Blob Writer Integration Test")]
+        [Xunit.FactAttribute(DisplayName="When the documents are passed in, a given set of blob\'s are written")]
         [Xunit.TraitAttribute("FeatureTitle", "BlobWriterSpecs")]
-        [Xunit.TraitAttribute("Description", "Blob Writer Integration Test")]
-        [Xunit.TraitAttribute("Category", "integrationtest")]
-        public virtual void BlobWriterIntegrationTest()
+        [Xunit.TraitAttribute("Description", "When the documents are passed in, a given set of blob\'s are written")]
+        [Xunit.TraitAttribute("Category", "counttest")]
+        public virtual void WhenTheDocumentsArePassedInAGivenSetOfBlobsAreWritten()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Blob Writer Integration Test", null, new string[] {
-                        "integrationtest"});
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When the documents are passed in, a given set of blob\'s are written", null, new string[] {
+                        "counttest"});
 #line 7
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
