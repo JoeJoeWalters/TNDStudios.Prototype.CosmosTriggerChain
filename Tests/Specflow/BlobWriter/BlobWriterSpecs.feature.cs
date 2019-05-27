@@ -98,6 +98,22 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.FactAttribute(DisplayName="When a document is written to a blob the data should be the same")]
+        [Xunit.TraitAttribute("FeatureTitle", "BlobWriterSpecs")]
+        [Xunit.TraitAttribute("Description", "When a document is written to a blob the data should be the same")]
+        [Xunit.TraitAttribute("Category", "datatest")]
+        public virtual void WhenADocumentIsWrittenToABlobTheDataShouldBeTheSame()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When a document is written to a blob the data should be the same", "\tGiven: A document is passed to the azure function\r\n\tThen: A blob with the same s" +
+                    "erialised content is written", new string[] {
+                        "datatest"});
+#line 13
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TechTalk.SpecFlow;
 using TNDStudios.Prototype.CosmosTriggerChain;
 using Xunit;
@@ -7,7 +6,8 @@ using Xunit;
 namespace Tests.Specflow.BlobWriter
 {
     [Binding]
-    public class BlobWriterSpecsSteps
+    [Scope(Tag = "counttest")]
+    public class CountTestSpecSteps
     {
         BlobWriterTests blobWriterTests;
         List<ProcessedObject> payloads;
